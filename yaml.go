@@ -86,7 +86,7 @@ func yamlToJSON(y []byte, jsonTarget *reflect.Value) ([]byte, error) {
 	// can have non-string keys in YAML). So, convert the YAML-compatible object
 	// to a JSON-compatible object, failing with an error if irrecoverable
 	// incompatibilties happen along the way.
-	jsonObj, err := convertToJSONableObject(yamlObj, jsonTarget)
+	jsonObj, err := ConvertToJSONableObject(yamlObj, jsonTarget)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func yamlToJSON(y []byte, jsonTarget *reflect.Value) ([]byte, error) {
 	return json.Marshal(jsonObj)
 }
 
-func convertToJSONableObject(yamlObj interface{}, jsonTarget *reflect.Value) (interface{}, error) {
+func ConvertToJSONableObject(yamlObj interface{}, jsonTarget *reflect.Value) (interface{}, error) {
 	var err error
 
 	// Resolve jsonTarget to a concrete value (i.e. not a pointer or an
@@ -192,7 +192,7 @@ func convertToJSONableObject(yamlObj interface{}, jsonTarget *reflect.Value) (in
 						// Find the reflect.Value of the most preferential
 						// struct field.
 						jtf := t.Field(f.index[0])
-						strMap[keyString], err = convertToJSONableObject(v, &jtf)
+						strMap[keyString], err = ConvertToJSONableObject(v, &jtf)
 						if err != nil {
 							return nil, err
 						}
@@ -202,14 +202,14 @@ func convertToJSONableObject(yamlObj interface{}, jsonTarget *reflect.Value) (in
 					// Create a zero value of the map's element type to use as
 					// the JSON target.
 					jtv := reflect.Zero(t.Type().Elem())
-					strMap[keyString], err = convertToJSONableObject(v, &jtv)
+					strMap[keyString], err = ConvertToJSONableObject(v, &jtv)
 					if err != nil {
 						return nil, err
 					}
 					continue
 				}
 			}
-			strMap[keyString], err = convertToJSONableObject(v, nil)
+			strMap[keyString], err = ConvertToJSONableObject(v, nil)
 			if err != nil {
 				return nil, err
 			}
@@ -237,7 +237,7 @@ func convertToJSONableObject(yamlObj interface{}, jsonTarget *reflect.Value) (in
 		// Make and use a new array.
 		arr := make([]interface{}, len(typedYAMLObj))
 		for i, v := range typedYAMLObj {
-			arr[i], err = convertToJSONableObject(v, jsonSliceElemValue)
+			arr[i], err = ConvertToJSONableObject(v, jsonSliceElemValue)
 			if err != nil {
 				return nil, err
 			}
